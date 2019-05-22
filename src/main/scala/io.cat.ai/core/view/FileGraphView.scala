@@ -5,6 +5,7 @@ import java.io.File
 import io.cat.ai.console._
 import io.cat.ai.core.file.FileOps._
 
+// TODO: rename?
 case class FileGraphView(lineColor: ConsoleColor,
                          dirColor: ConsoleColor,
                          fileColor: ConsoleColor,

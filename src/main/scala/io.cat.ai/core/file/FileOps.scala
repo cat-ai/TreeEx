@@ -17,6 +17,7 @@ object FileOps {
     def safeListFiles: List[File] = Option(file.listFiles) map(_ toList) getOrElse Nil
   }
 
+  // TODO: refactor
   implicit class FileLastModified(file: File) {
     def lastModifiedDate: String = s"${new Date(file.lastModified)}"
   }
