@@ -1,4 +1,4 @@
-package io.cat.ai.core.view
+package io.cat.ai.renderer
 
 trait Renderer[T] {
   def render(t: T): Unit

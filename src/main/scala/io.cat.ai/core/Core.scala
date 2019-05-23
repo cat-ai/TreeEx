@@ -3,8 +3,8 @@ package io.cat.ai.core
 import java.io.File
 
 import io.cat.ai.core.graph.Graph
-import io.cat.ai.core.view.Renderer
 import io.cat.ai.core.file.FileOps._
+import io.cat.ai.renderer.Renderer
 
 import scala.annotation.tailrec
 

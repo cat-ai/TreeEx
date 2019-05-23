@@ -1,31 +1,55 @@
 package io.cat.ai.console
 
+import io.cat.ai.app._
+
 object CLI {
 
-  object key {
+  object keys {
+    val path = "-p"
+    val help = "-h"
     val find = "-find"
-    val show = "-show"
+    val mark = "-mark"
   }
 
   object param {
     val dir = "dir"
     val file = "file"
-    val lm = "lm"
+    val lastModified = "lm"
   }
 
-  // TODO: refactor
-  def handleArgs(args: Array[String]): Params = args match {
+  private def modeWithMultiArgs(value: String, args: Array[String]): TreeExMode = args match {
 
-    case Array() => throw new IllegalArgumentException("Empty program arguments!")
+    case Array(_ @ param.dir, _ @ param.lastModified) => FindAndMarkMode(value, markDirectories = true, markFiles = false, markLm = true)
 
-    case Array(x) =>
-      if (x != "-p") throw new IllegalArgumentException("Param '-p' mandatory")
-      else throw new UnsupportedOperationException("Not implemented yet!")
-
-    case Array(key, path) => if (key == "-p") Params(path, path) else throw new IllegalArgumentException("Param '-p' mandatory")
-
-    case arr => throw new UnsupportedOperationException("Not implemented yet!")
+    case Array (_ @ param.file, _ @ param.lastModified) => FindAndMarkMode(value, markDirectories = false, markFiles = true, markLm = true)
   }
 
+  private val modeFromParams: List[String] => TreeExMode = {
 
+    case _ @ keys.find  :: value :: Nil => FindMode(value, markLm = false)
+
+    case List(_ @ keys.find, value, _ @ keys.mark, _ @ param.lastModified) => FindMode(value, markLm = true)
+
+    case List(_ @ keys.find, value, _ @ keys.mark, showArgs) => showArgs match {
+
+      case _ @ param.dir => FindAndMarkMode(value, markLm = false, markDirectories = true, markFiles = false)
+
+      case _ @ param.file => FindAndMarkMode(value, markLm = false, markDirectories = false, markFiles = true)
+
+      case multi if multi contains "&" => modeWithMultiArgs(value, multi split "&")
+
+      case _ => throw new IllegalArgumentException(s"Unknown arguments for ${keys.mark}")
+    }
+
+    case other => throw new IllegalArgumentException(s"Unknown arguments: $other")
+  }
+
+  def pathAndMode(args: Array[String]): (String, TreeExMode) = args.toList match {
+
+      case Nil => throw new IllegalArgumentException("Empty program arguments")
+
+      case _ @ keys.path :: path :: Nil => (path, DefaultMode)
+
+      case _ @ keys.path :: path :: params => (path, modeFromParams(params))
+    }
 }

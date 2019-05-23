@@ -2,20 +2,24 @@ package io.cat.ai
 
 import java.io.File
 
+import io.cat.ai.app.TreeExFileProcessor
 import io.cat.ai.console.CLI
 import io.cat.ai.core.Core
 import io.cat.ai.core.graph.Graph
-import io.cat.ai.core.view.{FileGraphRenderer, FileGraphView, Renderer}
+import io.cat.ai.core.view.FileGraphView
+import io.cat.ai.renderer.{FileGraphRenderer, Renderer}
 
 object TreeEx extends App {
 
-  val params = CLI.handleArgs(args)
+  val (path, mode) = CLI.pathAndMode(args)
 
-  val fileGraphView = FileGraphView()
+  val fileGraphView = FileGraphView.default
 
-  implicit val fileGraphRenderer: Renderer[Graph[File]] = new FileGraphRenderer(fileGraphView)
+  val settings = TreeExFileProcessor(path, mode, fileGraphView)
 
-  val graph = Core.graph(params.path)
+  implicit val fileGraphRenderer: Renderer[Graph[File]] = new FileGraphRenderer(settings)
+
+  val graph = Core.graph(settings.path)
 
   Core.render(graph)
 }

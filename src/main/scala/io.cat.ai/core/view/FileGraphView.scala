@@ -5,17 +5,19 @@ import java.io.File
 import io.cat.ai.console._
 import io.cat.ai.core.file.FileOps._
 
-// TODO: rename?
 case class FileGraphView(lineColor: ConsoleColor,
                          dirColor: ConsoleColor,
                          fileColor: ConsoleColor,
-                         foundColor: ConsoleColor) {
+                         foundColor: ConsoleColor,
+                         markColor: ConsoleColor) {
 
-  private def dir(name: String): String = s"${dirColor.color}$name${dirColor.reset}"
+  def dir(name: String): String = s"${dirColor.color}$name${dirColor.reset}"
 
-  private def file(name: String): String = s"${fileColor.color}$name${fileColor.reset}"
+  def file(name: String): String = s"${fileColor.color}$name${fileColor.reset}"
 
-  private def found(name: String): String = s"${foundColor.color}$name${foundColor.reset}"
+  def found(name: String): String = s"${foundColor.underlined}$name${foundColor.reset}"
+
+  def mark(name: String): String = s"${markColor.color}$name${markColor.reset}"
 
   def graphValue(elem: File): String = if (elem.isDirectory) dir(elem.getName) else file(elem.getName)
 
@@ -37,7 +39,8 @@ object FileGraphView {
   def apply(lineColor: ConsoleColor,
             dirColor: ConsoleColor,
             fileColor: ConsoleColor,
-            foundColor: ConsoleColor): FileGraphView = new FileGraphView(lineColor, dirColor, fileColor, foundColor)
+            foundColor: ConsoleColor,
+            markedColor: ConsoleColor): FileGraphView = new FileGraphView(lineColor, dirColor, fileColor, foundColor, markedColor)
 
-  def apply(): FileGraphView = FileGraphView(lineColor = White, dirColor = Blue, fileColor = Green, foundColor = Red )
+  def default: FileGraphView = FileGraphView(lineColor = White, dirColor = Blue, fileColor = Green, foundColor = Red, markedColor = Red)
 }
