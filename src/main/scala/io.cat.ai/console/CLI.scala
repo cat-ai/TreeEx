@@ -9,6 +9,7 @@ object CLI {
     val help = "-h"
     val find = "-find"
     val mark = "-mark"
+    val exclude = "-ex"
   }
 
   object param {
@@ -17,29 +18,38 @@ object CLI {
     val lastModified = "lm"
   }
 
-  private def modeWithMultiArgs(value: String, args: Array[String]): TreeExMode = args match {
+  private val markAndLm: (String, Array[String]) => FindAndMarkMode = (value, args) => args match {
 
-    case Array(_ @ param.dir, _ @ param.lastModified) => FindAndMarkMode(value, markDirectories = true, markFiles = false, markLm = true)
+    case Array(_ @ param.dir, _ @ param.lastModified) => FindAndMarkMode(value, None, markDirectories = true, markFiles = false, markLm = true)
 
-    case Array (_ @ param.file, _ @ param.lastModified) => FindAndMarkMode(value, markDirectories = false, markFiles = true, markLm = true)
+    case Array (_ @ param.file, _ @ param.lastModified) => FindAndMarkMode(value, None, markDirectories = false, markFiles = true, markLm = true)
+  }
+
+  private val excludeAndMark: (String, String) => FindAndMarkMode = (value, markArgs) => markArgs match {
+
+    case _ @ param.dir => FindAndMarkMode(value, None, markLm = false, markDirectories = true, markFiles = false)
+
+    case _ @ param.file => FindAndMarkMode(value, None, markLm = false, markDirectories = false, markFiles = true)
+
+    case _ @ param.lastModified => FindAndMarkMode(value, None, markLm = true, markDirectories = false, markFiles = false)
+
+    case multi if multi contains "&" => markAndLm(value, multi split "&")
+
+    case _ => throw new IllegalArgumentException(s"Unknown arguments for ${keys.mark}")
   }
 
   private val modeFromParams: List[String] => TreeExMode = {
 
-    case _ @ keys.find  :: value :: Nil => FindMode(value, markLm = false)
+    case _ @ keys.find  :: value :: Nil => FindMode(value, None, markLm = false)
 
-    case List(_ @ keys.find, value, _ @ keys.mark, _ @ param.lastModified) => FindMode(value, markLm = true)
+    case List(_ @ keys.find, value, _ @ keys.mark, _ @ param.lastModified) => FindMode(value, None, markLm = true)
 
-    case List(_ @ keys.find, value, _ @ keys.mark, showArgs) => showArgs match {
+    case List(_ @ keys.find, value, _ @ keys.exclude, exValue) => FindMode(value, Some(exValue), markLm = false)
 
-      case _ @ param.dir => FindAndMarkMode(value, markLm = false, markDirectories = true, markFiles = false)
+    case List(_ @ keys.find, value, _ @ keys.mark, markArgs) => excludeAndMark(value, markArgs)
 
-      case _ @ param.file => FindAndMarkMode(value, markLm = false, markDirectories = false, markFiles = true)
-
-      case multi if multi contains "&" => modeWithMultiArgs(value, multi split "&")
-
-      case _ => throw new IllegalArgumentException(s"Unknown arguments for ${keys.mark}")
-    }
+    case List(_ @ keys.find, value, _ @ keys.exclude, exValue, _ @ keys.mark, markArgs) =>
+      excludeAndMark(value, markArgs).copy(excludingValue = Some(exValue))
 
     case other => throw new IllegalArgumentException(s"Unknown arguments: ${other mkString ","}")
   }

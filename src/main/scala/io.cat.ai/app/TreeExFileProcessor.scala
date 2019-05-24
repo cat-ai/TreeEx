@@ -4,7 +4,7 @@ import java.io.File
 
 import io.cat.ai.core.view.FileGraphView
 
-case class TreeExFileProcessor(path: String, mode: TreeExMode, view: FileGraphView) {
+case class TreeExFileProcessor(mode: TreeExMode, view: FileGraphView) {
 
   def process(file: File): String =
 

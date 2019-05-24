@@ -30,13 +30,39 @@ object Core {
 
       case x if x.isDirectory => Graph(x, x.safeListFiles map build)
     }
+
+    def buildExcluding(file: File, excludeEdge: String): Graph[File] = {
+
+      def build(file: File): Graph[File] = file match {
+
+        case x if x.isFile && x.getName()(0) == '.' => Graph.empty[File]
+
+        case x if x.isFile => if (x.getName matches excludeEdge) Graph.empty[File] else Graph.one(x)
+
+        case x if x.isDirectory => Graph(x, x.safeListFiles filterNot(excludeEdge matches _.getName) map build)
+      }
+
+      build(file)
+    }
   }
+
+  def graph(path: String, exclude: String): Graph[File] = graph(new File(path), exclude)
 
   def graph(path: String): Graph[File] = graph(new File(path))
 
-  def graph(file: File): Graph[File] =
-    if (file.isDirectory) Graph(file, file.safeListFiles map graph.build)
+  def graph(file: File, excludeEdge: String): Graph[File] = {
+
+    if (file.isDirectory) Graph(file, file.safeListFiles filterNot(excludeEdge matches _.getName) map(graph.buildExcluding(_, excludeEdge)))
+
     else throw new IllegalArgumentException("Not directory")
+  }
+
+  def graph(file: File): Graph[File] = {
+
+    if (file.isDirectory) Graph(file, file.safeListFiles map graph.build)
+
+    else throw new IllegalArgumentException("Not directory")
+  }
 
   def render[E](graph: Graph[E])
                (implicit renderer: Renderer[Graph[E]]): Unit = renderer.render(graph)

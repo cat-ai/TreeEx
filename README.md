@@ -13,6 +13,8 @@ Program arguments
 
 -mark - marks dir/file
 
+-ex - exclude some file/dir
+
 ```
 Program parameters
 
