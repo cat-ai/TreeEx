@@ -13,7 +13,7 @@ sealed trait TreeExMode {
 
 case object DefaultMode extends TreeExMode {
 
-  override def value: String = ""
+  override def value: String = "<empty>"
 
   override def markLm: Boolean = false
 
