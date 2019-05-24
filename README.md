@@ -1,5 +1,7 @@
 ## TreeEx
 
+![Screenshot](https://github.com/cat-ai/TreeEx/blob/master/gif/tree_ex.gif)
+
 ## Getting Started
 
 Extended version of UNIX tree command
