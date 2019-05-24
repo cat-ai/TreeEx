@@ -21,7 +21,7 @@ class FileGraphRenderer(processor: TreeExFileProcessor) extends Renderer[Graph[F
     for (edge <- graph.edges dropRight 1 if edge.nonEmpty)
       renderEdge(prefix, processor.view.edgeView, processor.view.childEdgeView)(edge)
 
-    for (oneEdge <- graph.edges.lastOption)
+    for (oneEdge <- graph.edges.lastOption if oneEdge.nonEmpty)
       renderEdge(prefix, processor.view.oneEdgeView, processor.view.empty)(oneEdge)
   }
 
