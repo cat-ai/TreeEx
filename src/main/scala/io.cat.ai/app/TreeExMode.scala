@@ -15,7 +15,7 @@ sealed trait TreeExMode {
 
 case object DefaultMode extends TreeExMode {
 
-  override def value: String = excludingValue
+  override def value: String = "<empty>"
 
   override def markLm: Boolean = false
 
@@ -23,7 +23,7 @@ case object DefaultMode extends TreeExMode {
 
   override def markFiles: Boolean = false
 
-  override def excludingValue: Nothing = throw new NoSuchElementException("Excluding value: <empty>")
+  override def excludingValue: Option[String] = None
 }
 
 case class FindMode(override val value: String,
