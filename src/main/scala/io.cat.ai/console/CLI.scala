@@ -41,7 +41,7 @@ object CLI {
       case _ => throw new IllegalArgumentException(s"Unknown arguments for ${keys.mark}")
     }
 
-    case other => throw new IllegalArgumentException(s"Unknown arguments: $other")
+    case other => throw new IllegalArgumentException(s"Unknown arguments: ${other mkString ","}")
   }
 
   def pathAndMode(args: Array[String]): (String, TreeExMode) = args.toList match {
@@ -51,5 +51,7 @@ object CLI {
       case _ @ keys.path :: path :: Nil => (path, DefaultMode)
 
       case _ @ keys.path :: path :: params => (path, modeFromParams(params))
+
+      case other => throw new IllegalArgumentException(s"Unknown arguments: ${other.mkString}")
     }
 }
