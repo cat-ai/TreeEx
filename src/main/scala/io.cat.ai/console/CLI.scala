@@ -18,7 +18,7 @@ object CLI {
     val lastModified = "lm"
   }
 
-  private val markAndLm: (String, Array[String]) => FindAndMarkMode = (value, args) => args match {
+  private val markWithLm: (String, Array[String]) => FindAndMarkMode = (value, args) => args match {
 
     case Array(_ @ param.dir, _ @ param.lastModified) => FindAndMarkMode(value, None, markDirectories = true, markFiles = false, markLm = true)
 
@@ -33,7 +33,7 @@ object CLI {
 
     case _ @ param.lastModified => FindAndMarkMode(value, None, markLm = true, markDirectories = false, markFiles = false)
 
-    case multi if multi contains "&" => markAndLm(value, multi split "&")
+    case multi if multi contains "&" => markWithLm(value, multi split "&")
 
     case _ => throw new IllegalArgumentException(s"Unknown arguments for ${keys.mark}")
   }
