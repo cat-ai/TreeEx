@@ -31,7 +31,7 @@ Result: file graph
 
 ## Application usage
 
-* tree_ex -p /some/path/to/dir -find someFileOrDir -mark dir&lm
+* tree_ex -p /some/path/to/dir -find someFileOrDir,anotherFileOrDir -ex excludingFileOrDir -mark dir,lm
 
 ## Authors
 

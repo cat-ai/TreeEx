@@ -2,11 +2,13 @@ package io.cat.ai.console
 
 import io.cat.ai.app._
 
+import scala.annotation.tailrec
+import scala.language.postfixOps
+
 object CLI {
 
   object keys {
     val path = "-p"
-    val help = "-h"
     val find = "-find"
     val mark = "-mark"
     val exclude = "-ex"
@@ -18,50 +20,46 @@ object CLI {
     val lastModified = "lm"
   }
 
-  private val markWithLm: (String, Array[String]) => FindAndMarkMode = (value, args) => args match {
+  val isValueWrong: String => Boolean = _ startsWith "-"
 
-    case Array(_ @ param.dir, _ @ param.lastModified) => FindAndMarkMode(value, None, markDirectories = true, markFiles = false, markLm = true)
+  val splitToList: String => List[String] = arg => (arg split ",") toList
 
-    case Array (_ @ param.file, _ @ param.lastModified) => FindAndMarkMode(value, None, markDirectories = false, markFiles = true, markLm = true)
-  }
+  def markerFromArg(args: String): TreeExMarker = {
 
-  private val excludeAndMark: (String, String) => FindAndMarkMode = (value, markArgs) => markArgs match {
+    @tailrec
+    def recMarkArgParser(markArgs: List[String],
+                        treeExMarker: TreeExMarker): TreeExMarker = markArgs match {
 
-    case _ @ param.dir => FindAndMarkMode(value, None, markLm = false, markDirectories = true, markFiles = false)
-
-    case _ @ param.file => FindAndMarkMode(value, None, markLm = false, markDirectories = false, markFiles = true)
-
-    case _ @ param.lastModified => FindAndMarkMode(value, None, markLm = true, markDirectories = false, markFiles = false)
-
-    case multi if multi contains "&" => markWithLm(value, multi split "&")
-
-    case _ => throw new IllegalArgumentException(s"Unknown arguments for ${keys.mark}")
-  }
-
-  private val modeFromParams: List[String] => TreeExMode = {
-
-    case _ @ keys.find  :: value :: Nil => FindMode(value, None, markLm = false)
-
-    case List(_ @ keys.find, value, _ @ keys.mark, _ @ param.lastModified) => FindMode(value, None, markLm = true)
-
-    case List(_ @ keys.find, value, _ @ keys.exclude, exValue) => FindMode(value, Some(exValue), markLm = false)
-
-    case List(_ @ keys.find, value, _ @ keys.mark, markArgs) => excludeAndMark(value, markArgs)
-
-    case List(_ @ keys.find, value, _ @ keys.exclude, exValue, _ @ keys.mark, markArgs) =>
-      excludeAndMark(value, markArgs).copy(excludingValue = Some(exValue))
-
-    case other => throw new IllegalArgumentException(s"Unknown arguments: ${other mkString ","}")
-  }
-
-  def pathAndMode(args: Array[String]): (String, TreeExMode) = args.toList match {
-
-      case Nil => throw new IllegalArgumentException("Empty program arguments")
-
-      case _ @ keys.path :: path :: Nil => (path, DefaultMode)
-
-      case _ @ keys.path :: path :: params => (path, modeFromParams(params))
-
-      case other => throw new IllegalArgumentException(s"Unknown arguments: ${other.mkString}")
+      case Nil => treeExMarker
+      case _ @ param.dir :: tail => recMarkArgParser(tail, treeExMarker.copy(markDir = true))
+      case _ @ param.file :: tail => recMarkArgParser(tail, treeExMarker.copy(markFile = true))
+      case _ @ param.lastModified :: tail => recMarkArgParser(tail, treeExMarker.copy(markLm = true))
+      case other => throw new IllegalArgumentException(s"Unknown parameters: ${other mkString ","}")
     }
+
+    recMarkArgParser((args split ",") toList, TreeExMarker.default)
+  }
+
+  def parseArgs(args: Array[String]): TreeExArgs = {
+
+    @tailrec
+    def recParser(args: List[String], treeExArgs: TreeExArgs): TreeExArgs = args match {
+
+      case Nil => treeExArgs
+
+      case (_ @ keys.path) :: value :: tail => recParser(tail, treeExArgs.copy(path = Some(value)))
+
+      case (_ @ keys.find) :: value :: tail => recParser(tail, treeExArgs.copy(findValues = splitToList(value)))
+
+      case (_ @ keys.exclude) :: value :: tail => recParser(tail, treeExArgs.copy(exValues = splitToList(value)))
+
+      case (_ @ keys.mark) :: value :: tail => recParser(tail, treeExArgs.copy(marker = markerFromArg(value)))
+
+      case param :: value :: _ if isValueWrong(value) => throw new IllegalArgumentException(s"Unknown argument '$param $value'")
+
+      case other => throw new IllegalArgumentException(s"Unknown arguments '${other.mkString("= ")}'")
+    }
+
+    recParser(args.toList, TreeExArgs(marker = TreeExMarker.default))
+  }
 }

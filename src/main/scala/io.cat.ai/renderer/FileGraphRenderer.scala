@@ -16,7 +16,7 @@ class FileGraphRenderer(processor: TreeExFileProcessor) extends Renderer[Graph[F
     if (graph.value.isDirectory) renderGraph(graph, s"$prefix$nextOrOneEdgeView")
   }
 
-  def renderGraph(graph: Graph[File], prefix: String): Unit = {
+  def renderGraph(graph: Graph[File], prefix: String = ""): Unit = {
 
     for (edge <- graph.edges dropRight 1 if edge.nonEmpty)
       renderEdge(prefix, processor.view.edgeView, processor.view.childEdgeView)(edge)
@@ -25,5 +25,5 @@ class FileGraphRenderer(processor: TreeExFileProcessor) extends Renderer[Graph[F
       renderEdge(prefix, processor.view.oneEdgeView, processor.view.empty)(oneEdge)
   }
 
-  override def render(graph: Graph[File]): Unit = renderGraph(graph, "")
+  override def render(graph: Graph[File]): Unit = renderGraph(graph)
 }

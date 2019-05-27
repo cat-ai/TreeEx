@@ -8,19 +8,20 @@ case class TreeExFileProcessor(mode: TreeExMode, view: FileGraphView) {
 
   def process(file: File): String =
 
-    if (mode.value matches file.getName) handleFound(file)
+    if (mode.findValues exists(_ matches file.getName))
+      processFound(file)
+    else if (file.isDirectory)
+      processDirectory(file)
+    else
+      processFile(file)
 
-    else if (file.isDirectory) handleDirectory(file)
+  private def processDirectory(file: File): String = if (mode.markDirectories) processMarked(file) else view.dir(file.getName)
 
-    else handleFile(file)
+  private def processFile(file: File): String = if (mode.markFiles) processMarked(file) else view.file(file.getName)
 
-  private def handleDirectory(file: File): String = if (mode.markDirectories) handleMarked(file) else view.dir(file.getName)
-
-  private def handleFile(file: File): String = if (mode.markFiles) handleMarked(file) else view.file(file.getName)
-
-  private def handleFound(file: File): String =
+  private def processFound(file: File): String =
     if (mode.markLm) s"${view.foundEdge(file)} : ${view.lastModified(file)}"
     else view.foundEdge(file)
 
-  private def handleMarked(file: File): String = view.mark(file.getName)
+  private def processMarked(file: File): String = view.mark(file.getName)
 }

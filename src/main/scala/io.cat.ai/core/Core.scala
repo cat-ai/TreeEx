@@ -31,28 +31,28 @@ object Core {
       case x if x.isDirectory => Graph(x, x.safeListFiles map build)
     }
 
-    def buildExcluding(file: File, excludeEdge: String): Graph[File] = {
+    def buildExcluding(file: File, excludeEdge: List[String]): Graph[File] = {
 
       def build(file: File): Graph[File] = file match {
 
         case x if x.isFile && x.getName()(0) == '.' => Graph.empty[File]
 
-        case x if x.isFile => if (x.getName matches excludeEdge) Graph.empty[File] else Graph.one(x)
+        case x if x.isFile => if (excludeEdge exists(_ matches x.getName)) Graph.empty[File] else Graph.one(x)
 
-        case x if x.isDirectory => Graph(x, x.safeListFiles filterNot(excludeEdge matches _.getName) map build)
+        case x if x.isDirectory => Graph(x, x.safeListFiles filterNot { edge => excludeEdge exists(_ matches edge.getName) } map build)
       }
 
       build(file)
     }
   }
 
-  def graph(path: String, exclude: String): Graph[File] = graph(new File(path), exclude)
+  def graph(path: String, exclude: List[String]): Graph[File] = graph(new File(path), exclude)
 
   def graph(path: String): Graph[File] = graph(new File(path))
 
-  def graph(file: File, excludeEdge: String): Graph[File] = {
+  def graph(file: File, excludeEdges: List[String]): Graph[File] = {
 
-    if (file.isDirectory) Graph(file, file.safeListFiles filterNot(excludeEdge matches _.getName) map(graph.buildExcluding(_, excludeEdge)))
+    if (file.isDirectory) Graph(file, file.safeListFiles filterNot(excludeEdges contains _.getName) map(graph.buildExcluding(_, excludeEdges)))
 
     else throw new IllegalArgumentException("Not directory")
   }
