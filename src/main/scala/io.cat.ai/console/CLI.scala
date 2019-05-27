@@ -14,7 +14,7 @@ object CLI {
     val exclude = "-ex"
   }
 
-  object param {
+  object markParam {
     val dir = "dir"
     val file = "file"
     val lastModified = "lm"
@@ -31,10 +31,10 @@ object CLI {
                         treeExMarker: TreeExMarker): TreeExMarker = markArgs match {
 
       case Nil => treeExMarker
-      case _ @ param.dir :: tail => recMarkArgParser(tail, treeExMarker.copy(markDir = true))
-      case _ @ param.file :: tail => recMarkArgParser(tail, treeExMarker.copy(markFile = true))
-      case _ @ param.lastModified :: tail => recMarkArgParser(tail, treeExMarker.copy(markLm = true))
-      case other => throw new IllegalArgumentException(s"Unknown parameters: ${other mkString ","}")
+      case _ @ markParam.dir :: tail => recMarkArgParser(tail, treeExMarker.copy(markDir = true))
+      case _ @ markParam.file :: tail => recMarkArgParser(tail, treeExMarker.copy(markFile = true))
+      case _ @ markParam.lastModified :: tail => recMarkArgParser(tail, treeExMarker.copy(markLm = true))
+      case other => throw new IllegalArgumentException(s"Unknown parameter value for ${keys.mark}: ${other mkString ","}")
     }
 
     recMarkArgParser((args split ",") toList, TreeExMarker.default)
