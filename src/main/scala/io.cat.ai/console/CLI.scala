@@ -7,7 +7,7 @@ import scala.language.postfixOps
 
 object CLI {
 
-  object keys {
+  object appArg {
     val path = "-p"
     val find = "-find"
     val mark = "-mark"
@@ -28,13 +28,13 @@ object CLI {
 
     @tailrec
     def recMarkArgParser(markArgs: List[String],
-                        treeExMarker: TreeExMarker): TreeExMarker = markArgs match {
+                         treeExMarker: TreeExMarker): TreeExMarker = markArgs match {
 
       case Nil => treeExMarker
       case _ @ markParam.dir :: tail => recMarkArgParser(tail, treeExMarker.copy(markDir = true))
       case _ @ markParam.file :: tail => recMarkArgParser(tail, treeExMarker.copy(markFile = true))
       case _ @ markParam.lastModified :: tail => recMarkArgParser(tail, treeExMarker.copy(markLm = true))
-      case other => throw new IllegalArgumentException(s"Unknown parameter value for ${keys.mark}: ${other mkString ","}")
+      case other => throw new IllegalArgumentException(s"Unknown parameter value for ${appArg.mark}: ${other mkString ","}")
     }
 
     recMarkArgParser((args split ",") toList, TreeExMarker.default)
@@ -47,13 +47,13 @@ object CLI {
 
       case Nil => treeExArgs
 
-      case (_ @ keys.path) :: value :: tail => recParser(tail, treeExArgs.copy(path = Some(value)))
+      case (_ @ appArg.path) :: value :: tail => recParser(tail, treeExArgs.copy(path = Some(value)))
 
-      case (_ @ keys.find) :: value :: tail => recParser(tail, treeExArgs.copy(findValues = splitToList(value)))
+      case (_ @ appArg.find) :: value :: tail => recParser(tail, treeExArgs.copy(findValues = splitToList(value)))
 
-      case (_ @ keys.exclude) :: value :: tail => recParser(tail, treeExArgs.copy(exValues = splitToList(value)))
+      case (_ @ appArg.exclude) :: value :: tail => recParser(tail, treeExArgs.copy(exValues = splitToList(value)))
 
-      case (_ @ keys.mark) :: value :: tail => recParser(tail, treeExArgs.copy(marker = markerFromArg(value)))
+      case (_ @ appArg.mark) :: value :: tail => recParser(tail, treeExArgs.copy(marker = markerFromArg(value)))
 
       case param :: value :: _ if isValueWrong(value) => throw new IllegalArgumentException(s"Unknown argument '$param $value'")
 
