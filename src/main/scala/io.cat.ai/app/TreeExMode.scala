@@ -1,6 +1,6 @@
 package io.cat.ai.app
 
-trait TreeExMode {
+sealed trait TreeExMode {
 
   def findValues: List[String]
 
@@ -12,12 +12,6 @@ trait TreeExMode {
 
   def markFiles: Boolean
 }
-
-case class SpecMode(override val findValues: List[String],
-                    override val excludeValues: List[String],
-                    override val markLm: Boolean,
-                    override val markDirectories: Boolean = false,
-                    override val markFiles: Boolean = false) extends TreeExMode
 
 case object DefaultMode extends TreeExMode {
 
@@ -32,8 +26,8 @@ case object DefaultMode extends TreeExMode {
   override def excludeValues: List[String] = Nil
 }
 
-case class SpecifiedMode(override val findValues: List[String],
-                         override val excludeValues: List[String],
-                         override val markLm: Boolean,
-                         override val markDirectories: Boolean,
-                         override val markFiles: Boolean) extends TreeExMode
+case class SpecMode(override val findValues: List[String],
+                    override val excludeValues: List[String],
+                    override val markLm: Boolean,
+                    override val markDirectories: Boolean,
+                    override val markFiles: Boolean) extends TreeExMode

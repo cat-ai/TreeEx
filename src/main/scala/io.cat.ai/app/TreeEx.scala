@@ -11,11 +11,11 @@ object TreeEx {
 
     case TreeExArgs(Some(value), Nil, Nil, TreeExMarker(false, false, false)) => value -> DefaultMode
 
-    case TreeExArgs(Some(value), Nil, Nil, marker) => value -> SpecifiedMode(Nil, Nil, marker.markLm, marker.markDir, marker.markFile)
+    case TreeExArgs(Some(value), Nil, Nil, marker) => value -> SpecMode(Nil, Nil, marker.markLm, marker.markDir, marker.markFile)
 
-    case TreeExArgs(Some(value), findValues, Nil, marker) => value -> SpecifiedMode(findValues, Nil, marker.markLm, marker.markDir, marker.markFile)
+    case TreeExArgs(Some(value), findValues, Nil, marker) => value -> SpecMode(findValues, Nil, marker.markLm, marker.markDir, marker.markFile)
 
-    case TreeExArgs(Some(value), findValues, exValues, marker) => value -> SpecifiedMode(findValues, exValues, marker.markLm, marker.markDir, marker.markFile)
+    case TreeExArgs(Some(value), findValues, exValues, marker) => value -> SpecMode(findValues, exValues, marker.markLm, marker.markDir, marker.markFile)
   }
 
   def view: FileGraphView = FileGraphView.default
