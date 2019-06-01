@@ -1,8 +1,8 @@
-package io.cat.ai.renderer
+package io.cat.ai.core.renderer
 
 import java.io.File
 
-import io.cat.ai.app.TreeExFileProcessor
+import io.cat.ai.app.processor.TreeExFileProcessor
 import io.cat.ai.core.graph.Graph
 
 class FileGraphRenderer(processor: TreeExFileProcessor) extends Renderer[Graph[File]] {

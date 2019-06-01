@@ -1,43 +1,45 @@
 package io.cat.ai.console
 
-import io.cat.ai.app._
+import io.cat.ai.app.args.{TreeExArgs, TreeExMarker}
+import io.cat.ai.app.config.TreeExConfig
 
 import scala.annotation.tailrec
-import scala.language.postfixOps
 
-object CLI {
+class CLI (conf: TreeExConfig) {
 
-  object appArg {
-    val path = "-p"
-    val find = "-find"
-    val mark = "-mark"
-    val exclude = "-ex"
+  object appArgs {
+    val path: Option[String] = conf.argByDescr("path")
+    val find: Option[String] = conf.argByDescr("find")
+    val exclude: Option[String] = conf.argByDescr("exclude")
+    val mark: Option[String] = conf.argByDescr("mark")
+
+    val mandatory: Option[String] = path
   }
 
-  object markParam {
-    val dir = "dir"
-    val file = "file"
-    val lastModified = "lm"
+  object markArg {
+    val markDir: Option[String] = conf.argValue("mark", "markDir")
+    val markFile: Option[String] = conf.argValue("mark", "markFile")
+    val lastModified: Option[String] = conf.argValue("mark", "markLm")
   }
 
-  val isValueWrong: String => Boolean = _ startsWith "-"
+  val isValueIncorrect: String => Boolean = _ startsWith "-"
 
-  val splitToList: String => List[String] = arg => (arg split ",") toList
+  val splitToList: (String, String) => List[String] = _ split _ toList
+
+  val split: String => List[String] = splitToList(_, conf.getClArgSplitter)
 
   def markerFromArg(args: String): TreeExMarker = {
 
     @tailrec
-    def recMarkArgParser(markArgs: List[String],
-                         treeExMarker: TreeExMarker): TreeExMarker = markArgs match {
-
-      case Nil => treeExMarker
-      case _ @ markParam.dir :: tail => recMarkArgParser(tail, treeExMarker.copy(markDir = true))
-      case _ @ markParam.file :: tail => recMarkArgParser(tail, treeExMarker.copy(markFile = true))
-      case _ @ markParam.lastModified :: tail => recMarkArgParser(tail, treeExMarker.copy(markLm = true))
-      case other => throw new IllegalArgumentException(s"Unknown parameter value for ${appArg.mark}: ${other mkString ","}")
+    def recMarkArgParser(markArgs: List[String], marker: TreeExMarker): TreeExMarker = markArgs match {
+      case Nil => marker
+      case d :: tail if markArg.markDir contains d => recMarkArgParser(tail, marker.copy(markDir = true))
+      case f :: tail if markArg.markFile contains f => recMarkArgParser(tail, marker.copy(markFile = true))
+      case lm :: tail if markArg.lastModified contains lm => recMarkArgParser(tail, marker.copy(markLm = true))
+      case other => throw new IllegalArgumentException(s"Unknown parameter value for ${appArgs.mark}: ${other mkString ","}")
     }
 
-    recMarkArgParser((args split ",") toList, TreeExMarker.default)
+    recMarkArgParser(split(args), TreeExMarker.default)
   }
 
   def parseArgs(args: Array[String]): TreeExArgs = {
@@ -47,15 +49,15 @@ object CLI {
 
       case Nil => treeExArgs
 
-      case (_ @ appArg.path) :: value :: tail => recParser(tail, treeExArgs.copy(path = Some(value)))
+      case path :: value :: tail if appArgs.path contains path => recParser(tail, treeExArgs.copy(path = Some(value)))
 
-      case (_ @ appArg.find) :: value :: tail => recParser(tail, treeExArgs.copy(findValues = splitToList(value)))
+      case find :: value :: tail if appArgs.find contains find => recParser(tail, treeExArgs.copy(findValues = split(value)))
 
-      case (_ @ appArg.exclude) :: value :: tail => recParser(tail, treeExArgs.copy(exValues = splitToList(value)))
+      case ex :: value :: tail if appArgs.exclude contains ex => recParser(tail, treeExArgs.copy(exValues = split(value)))
 
-      case (_ @ appArg.mark) :: value :: tail => recParser(tail, treeExArgs.copy(marker = markerFromArg(value)))
+      case mark :: value :: tail if appArgs.mark contains mark => recParser(tail, treeExArgs.copy(marker = markerFromArg(value)))
 
-      case param :: value :: _ if isValueWrong(value) => throw new IllegalArgumentException(s"Unknown argument '$param $value'")
+      case arg :: value :: _ if isValueIncorrect(value) => throw new IllegalArgumentException(s"Unknown argument '$arg $value'")
 
       case other => throw new IllegalArgumentException(s"Unknown arguments '${other.mkString("= ")}'")
     }

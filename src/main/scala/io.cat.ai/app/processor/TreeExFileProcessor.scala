@@ -1,7 +1,8 @@
-package io.cat.ai.app
+package io.cat.ai.app.processor
 
 import java.io.File
 
+import io.cat.ai.app.mode.TreeExMode
 import io.cat.ai.core.view.FileGraphView
 
 case class TreeExFileProcessor(mode: TreeExMode, view: FileGraphView) {

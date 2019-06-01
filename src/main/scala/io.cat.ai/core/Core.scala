@@ -4,7 +4,7 @@ import java.io.File
 
 import io.cat.ai.core.graph.Graph
 import io.cat.ai.core.file.FileOps._
-import io.cat.ai.renderer.Renderer
+import io.cat.ai.core.renderer.Renderer
 
 import scala.annotation.tailrec
 
@@ -31,7 +31,7 @@ object Core {
       case x if x.isDirectory => Graph(x, x.safeListFiles map build)
     }
 
-    def buildExcluding(file: File, excludeEdge: List[String]): Graph[File] = {
+    def buildExcluding(file: File, excludeEdge: Stream[String]): Graph[File] = {
 
       def build(file: File): Graph[File] = file match {
 
@@ -46,11 +46,11 @@ object Core {
     }
   }
 
-  def graph(path: String, exclude: List[String]): Graph[File] = graph(new File(path), exclude)
+  def graph(path: String, exclude: List[String]): Graph[File] = graph(new File(path), exclude.toStream)
 
   def graph(path: String): Graph[File] = graph(new File(path))
 
-  def graph(file: File, excludeEdges: List[String]): Graph[File] = {
+  def graph(file: File, excludeEdges: Stream[String]): Graph[File] = {
 
     if (file.isDirectory) Graph(file, file.safeListFiles filterNot(excludeEdges contains _.getName) map(graph.buildExcluding(_, excludeEdges)))
 

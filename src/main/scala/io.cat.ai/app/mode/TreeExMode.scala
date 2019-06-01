@@ -1,4 +1,4 @@
-package io.cat.ai.app
+package io.cat.ai.app.mode
 
 sealed trait TreeExMode {
 

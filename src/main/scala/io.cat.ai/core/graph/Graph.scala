@@ -15,11 +15,11 @@ trait Graph[E] {
 
 object Graph {
 
-  def dfs[E](current: Graph[E], acc: List[Graph[E]]): List[Graph[E]] =
-    current :: current.edges.foldLeft(acc) {
+  def dfs[E](current: Graph[E], acc: Seq[Graph[E]]): Seq[Graph[E]] =
+    current +: current.edges.foldLeft(acc) {
       (resList, next) =>
         if (resList contains next) resList
-        else dfs(next, current :: resList)
+        else dfs(next, current +: resList)
     }
 
   def empty[E]: Graph[E] = new Graph[E] {
