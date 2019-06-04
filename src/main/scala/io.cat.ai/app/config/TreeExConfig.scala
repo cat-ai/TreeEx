@@ -2,11 +2,11 @@ package io.cat.ai.app.config
 
 import com.typesafe.config.Config
 
-import io.cat.ai.app.args.{CLArg, CLArgValue, CLArgsValue}
+import io.cat.ai.app.console.args.{CLArg, CLArgValue, CLArgsValue}
 
 import scala.collection.JavaConverters._
 
-class TreeExConfig (conf: Config) {
+final case class TreeExConfig(conf: Config) {
 
   lazy val appArgs: Vector[CLArg] =
     for {

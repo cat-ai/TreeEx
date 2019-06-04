@@ -2,7 +2,7 @@ package io.cat.ai
 
 import io.cat.ai.app.TreeEx
 import io.cat.ai.app.config.TreeExConfigFactory
-import io.cat.ai.console.CLIFactory
+import io.cat.ai.app.console.CLIFactory
 
 object Main extends App {
 

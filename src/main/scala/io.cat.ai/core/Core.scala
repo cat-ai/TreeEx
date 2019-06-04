@@ -4,7 +4,6 @@ import java.io.File
 
 import io.cat.ai.core.graph.Graph
 import io.cat.ai.core.file.FileOps._
-import io.cat.ai.core.renderer.Renderer
 
 import scala.annotation.tailrec
 
@@ -13,13 +12,12 @@ object Core {
   private object graph {
 
     @tailrec
-    def build(edges: Seq[File], acc: List[File]): Seq[File] = edges match {
+    def build(edges: Stream[File], acc: Stream[File]): Stream[File] = edges match {
+      case Stream.Empty => acc
 
-      case Nil => acc
+      case x #:: xs if x.isDirectory => build(x.safeListFiles.toStream #::: xs, x #:: acc)
 
-      case x::xs if x.isDirectory => build(x.safeListFiles ::: xs, x :: acc)
-
-      case x::xs => if (x.getName()(0) != '.') build(xs, x :: acc) else build(xs, acc)
+      case x #:: xs => if (x.getName()(0) != '.') build(xs, x #:: acc) else build(xs, acc)
     }
 
     def build(file: File): Graph[File] = file match {
@@ -63,7 +61,4 @@ object Core {
 
     else throw new IllegalArgumentException("Not directory")
   }
-
-  def render[E](graph: Graph[E])
-               (implicit renderer: Renderer[Graph[E]]): Unit = renderer.render(graph)
 }

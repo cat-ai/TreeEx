@@ -1,4 +1,4 @@
-package io.cat.ai.console
+package io.cat.ai.app.console.colors
 
 sealed trait ConsoleColor {
 

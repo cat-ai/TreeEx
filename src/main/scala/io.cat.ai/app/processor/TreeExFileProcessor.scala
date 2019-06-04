@@ -3,9 +3,9 @@ package io.cat.ai.app.processor
 import java.io.File
 
 import io.cat.ai.app.mode.TreeExMode
-import io.cat.ai.core.view.FileGraphView
+import io.cat.ai.app.view.FileGraphView
 
-case class TreeExFileProcessor(mode: TreeExMode, view: FileGraphView) {
+final case class TreeExFileProcessor(mode: TreeExMode, view: FileGraphView) {
 
   def process(file: File): String =
 

@@ -1,11 +1,11 @@
-package io.cat.ai.core.renderer
+package io.cat.ai.app.renderer
 
 import java.io.File
 
 import io.cat.ai.app.processor.TreeExFileProcessor
 import io.cat.ai.core.graph.Graph
 
-class FileGraphRenderer(processor: TreeExFileProcessor) extends Renderer[Graph[File]] {
+final case class FileGraphRenderer(processor: TreeExFileProcessor) extends Renderer[Graph[File]] {
 
   def renderEdge(prefix: String,
                  edgeView: String,

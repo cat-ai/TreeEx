@@ -1,15 +1,15 @@
-package io.cat.ai.core.view
+package io.cat.ai.app.view
 
 import java.io.File
 
-import io.cat.ai.console._
+import io.cat.ai.app.console.colors._
 import io.cat.ai.core.file.FileOps._
 
-case class FileGraphView(lineColor: ConsoleColor,
-                         dirColor: ConsoleColor,
-                         fileColor: ConsoleColor,
-                         foundColor: ConsoleColor,
-                         markColor: ConsoleColor) {
+final case class FileGraphView(lineColor: ConsoleColor,
+                               dirColor: ConsoleColor,
+                               fileColor: ConsoleColor,
+                               foundColor: ConsoleColor,
+                               markColor: ConsoleColor) {
 
   def dir(name: String): String = s"${dirColor.color}$name${dirColor.reset}"
 
@@ -32,15 +32,4 @@ case class FileGraphView(lineColor: ConsoleColor,
   def lastModified(elem: File): String = s"${foundColor.color}${elem.lastModifiedDate}${foundColor.reset}"
 
   def empty: String = "    "
-}
-
-object FileGraphView {
-
-  def apply(lineColor: ConsoleColor,
-            dirColor: ConsoleColor,
-            fileColor: ConsoleColor,
-            foundColor: ConsoleColor,
-            markedColor: ConsoleColor): FileGraphView = new FileGraphView(lineColor, dirColor, fileColor, foundColor, markedColor)
-
-  def default: FileGraphView = FileGraphView(lineColor = White, dirColor = Blue, fileColor = Green, foundColor = Red, markedColor = Red)
 }

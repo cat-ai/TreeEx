@@ -2,20 +2,20 @@ package io.cat.ai.app
 
 import java.io.File
 
-import io.cat.ai.app.args.{TreeExArgs, TreeExMarker}
+import io.cat.ai.app.console.args._
 import io.cat.ai.app.mode.{DefaultMode, SpecMode, TreeExMode}
 import io.cat.ai.app.processor.TreeExFileProcessor
-import io.cat.ai.console.CLI
+import io.cat.ai.app.view.ViewFactory
+import io.cat.ai.app.console.TreeExCLI
+import io.cat.ai.app.renderer.{FileGraphRenderer, Renderer}
 import io.cat.ai.core.Core
 import io.cat.ai.core.graph.Graph
-import io.cat.ai.core.renderer.{FileGraphRenderer, Renderer}
-import io.cat.ai.core.view.ViewFactory
 
-class TreeEx (cli: CLI) {
+class TreeEx (cli: TreeExCLI) {
 
   def pathAndMode(args: Array[String]): (String, TreeExMode) = cli parseArgs args match {
 
-    case TreeExArgs(None, _, _, _) => throw new IllegalArgumentException(s"Missed mandatory program argument ${cli.appArgs.mandatory.get}")
+    case TreeExArgs(None, _, _, _) => throw new IllegalArgumentException(s"Missed mandatory program argument ${cli.appArgs.mandatory.mkString}")
 
     case TreeExArgs(Some(value), Nil, Nil, TreeExMarker(false, false, false)) => value -> DefaultMode
 
@@ -25,6 +25,9 @@ class TreeEx (cli: CLI) {
 
     case TreeExArgs(Some(value), findValues, exValues, marker) => value -> SpecMode(findValues, exValues, marker.markLm, marker.markDir, marker.markFile)
   }
+
+  def render[E](graph: Graph[E])
+               (implicit renderer: Renderer[Graph[E]]): Unit = renderer.render(graph)
 
   def run(args: Array[String]): Unit = {
 
@@ -39,8 +42,8 @@ class TreeEx (cli: CLI) {
 
     val processor = TreeExFileProcessor(treeExMode, graphView)
 
-    implicit val fileGraphRenderer: Renderer[Graph[File]] = new FileGraphRenderer(processor)
+    implicit val fileGraphRenderer: Renderer[Graph[File]] = FileGraphRenderer(processor)
 
-    Core.render(graph)
+    render(graph)
   }
 }

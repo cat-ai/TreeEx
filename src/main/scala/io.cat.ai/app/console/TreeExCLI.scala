@@ -1,11 +1,12 @@
-package io.cat.ai.console
+package io.cat.ai.app.console
 
-import io.cat.ai.app.args.{TreeExArgs, TreeExMarker}
 import io.cat.ai.app.config.TreeExConfig
+import io.cat.ai.app.console.args.{TreeExArgs, TreeExMarker}
 
 import scala.annotation.tailrec
+import scala.language.postfixOps
 
-class CLI (conf: TreeExConfig) {
+final case class TreeExCLI(conf: TreeExConfig) {
 
   object appArgs {
     val path: Option[String] = conf.argByDescr("path")

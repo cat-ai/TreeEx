@@ -8,7 +8,7 @@ trait Graph[E] {
 
   def isEmpty: Boolean
 
-  def nonEmpty = !isEmpty
+  def nonEmpty: Boolean = !isEmpty
 
   def find(e: E): Option[Graph[E]]
 }

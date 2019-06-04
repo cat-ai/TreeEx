@@ -26,8 +26,8 @@ case object DefaultMode extends TreeExMode {
   override def excludeValues: List[String] = Nil
 }
 
-case class SpecMode(override val findValues: List[String],
-                    override val excludeValues: List[String],
-                    override val markLm: Boolean,
-                    override val markDirectories: Boolean,
-                    override val markFiles: Boolean) extends TreeExMode
+final case class SpecMode(override val findValues: List[String],
+                          override val excludeValues: List[String],
+                          override val markLm: Boolean,
+                          override val markDirectories: Boolean,
+                          override val markFiles: Boolean) extends TreeExMode

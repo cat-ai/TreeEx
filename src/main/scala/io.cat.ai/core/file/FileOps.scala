@@ -3,6 +3,8 @@ package io.cat.ai.core.file
 import java.io.File
 import java.util.Date
 
+import scala.language.postfixOps
+
 object FileOps {
 
   implicit class FileAsOpt(file: File) {
