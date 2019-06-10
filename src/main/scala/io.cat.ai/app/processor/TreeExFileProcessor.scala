@@ -7,14 +7,13 @@ import io.cat.ai.app.view.FileGraphView
 
 final case class TreeExFileProcessor(mode: TreeExMode, view: FileGraphView) {
 
-  def process(file: File): String =
+  def process(file: File): String = file match {
+    case x if mode.findValues exists(_ matches x.getName) => processFound(x)
 
-    if (mode.findValues exists(_ matches file.getName))
-      processFound(file)
-    else if (file.isDirectory)
-      processDirectory(file)
-    else
-      processFile(file)
+    case x if x.isDirectory =>  processDirectory(x)
+
+    case x => processFile(x)
+  }
 
   private def processDirectory(file: File): String = if (mode.markDirectories) processMarked(file) else view.dir(file.getName)
 
