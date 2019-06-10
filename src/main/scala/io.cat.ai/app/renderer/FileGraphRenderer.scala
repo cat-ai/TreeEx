@@ -25,10 +25,13 @@ final case class FileGraphRenderer(processor: TreeExFileProcessor) extends Rende
       s"${walker.nDirs} marked directories, ${walker.nFiles} files${option("find", find)}${option("exclude", exclude)}"
 
     case SpecMode(find, exclude, _, true, _) =>
-      s"${walker.nDirs} marked directories, ${walker.nFiles} files${option("find", find)} ${option("exclude", exclude)}"
+      s"${walker.nDirs} marked directories, ${walker.nFiles} files${option("find", find)}${option("exclude", exclude)}"
 
     case SpecMode(find, exclude, _, _, true) =>
-      s"${walker.nDirs} directories, ${walker.nFiles} marked files${option("find", find)} ${option("exclude", exclude)}"
+      s"${walker.nDirs} directories, ${walker.nFiles} marked files${option("find", find)}${option("exclude", exclude)}"
+
+    case SpecMode(find, exclude, _, _, _) =>
+      s"${walker.nDirs} directories, ${walker.nFiles} files${option("find", find)}${option("exclude", exclude)}"
   }
 
   def renderEdge(prefix: String,
