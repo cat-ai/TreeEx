@@ -22,7 +22,7 @@ final case class FileGraphRenderer(processor: TreeExFileProcessor) extends Rende
     case DefaultMode => s"${walker.nDirs} directories, ${walker.nFiles} files"
 
     case SpecMode(find, exclude, true, _, _) =>
-      s"${walker.nDirs} marked directories, ${walker.nFiles} files${option("find", find)}${option("exclude", exclude)}"
+      s"${walker.nDirs} directories, ${walker.nFiles} files${option("find", find)}${option("exclude", exclude)}"
 
     case SpecMode(find, exclude, _, true, _) =>
       s"${walker.nDirs} marked directories, ${walker.nFiles} files${option("find", find)}${option("exclude", exclude)}"
