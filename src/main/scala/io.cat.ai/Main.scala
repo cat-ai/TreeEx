@@ -6,8 +6,6 @@ import io.cat.ai.app.console.{CLI, TreeExCLI}
 
 object Main extends App {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   val config: TreeExConfig = TreeExConfigFactory.create
 
   val cli: TreeExCLI = CLI.create(config)
