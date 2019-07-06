@@ -5,9 +5,11 @@ import java.io.File
 import io.cat.ai.app.mode.TreeExMode
 import io.cat.ai.app.view.FileGraphView
 
-final case class TreeExFileProcessor(mode: TreeExMode, view: FileGraphView) {
+final case class TreeExFileProcessor(mode: TreeExMode,
+                                     view: FileGraphView) extends Processor[File, String] {
 
-  def process(file: File): String = file match {
+  override def process(file: File): String = file match {
+
     case x if mode.findValues exists(_ matches x.getName) => processFound(x)
 
     case x if x.isDirectory =>  processDirectory(x)
@@ -15,9 +17,11 @@ final case class TreeExFileProcessor(mode: TreeExMode, view: FileGraphView) {
     case x => processFile(x)
   }
 
-  private def processDirectory(file: File): String = if (mode.markDirectories) processMarked(file) else view.dir(file.getName)
+  private def processDirectory(file: File): String =
+    if (mode.markDirectories) processMarked(file) else view.dir(file.getName)
 
-  private def processFile(file: File): String = if (mode.markFiles) processMarked(file) else view.file(file.getName)
+  private def processFile(file: File): String =
+    if (mode.markFiles) processMarked(file) else view.file(file.getName)
 
   private def processFound(file: File): String =
     if (mode.markLm) s"${view.foundEdge(file)} : ${view.lastModified(file)}"

@@ -17,9 +17,11 @@ object Graph {
 
   def dfs[E](current: Graph[E], acc: Seq[Graph[E]]): Seq[Graph[E]] =
     current +: current.edges.foldLeft(acc) {
-      (resList, next) =>
-        if (resList contains next) resList
-        else dfs(next, current +: resList)
+      (resList, next) => resList match {
+        case xs if xs contains next => xs
+
+        case xs => dfs(next, current +: xs)
+      }
     }
 
   def empty[E]: Graph[E] = new Graph[E] {

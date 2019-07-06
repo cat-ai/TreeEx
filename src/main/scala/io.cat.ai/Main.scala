@@ -1,16 +1,18 @@
 package io.cat.ai
 
-import io.cat.ai.app.TreeEx
-import io.cat.ai.app.config.TreeExConfigFactory
-import io.cat.ai.app.console.CLIFactory
+import io.cat.ai.app.Runner
+import io.cat.ai.app.config.{TreeExConfig, TreeExConfigFactory}
+import io.cat.ai.app.console.{CLI, TreeExCLI}
 
 object Main extends App {
 
-  val treeExConfig = TreeExConfigFactory.create
+  import scala.concurrent.ExecutionContext.Implicits.global
 
-  val cli = CLIFactory(treeExConfig)
+  val config: TreeExConfig = TreeExConfigFactory.create
 
-  val treeEx = new TreeEx(cli)
+  val cli: TreeExCLI = CLI.create(config)
 
-  treeEx.run(args)
+  val runner: Runner = new Runner(cli)
+
+  runner.main(args)
 }
