@@ -3,6 +3,7 @@ package io.cat.ai.app.console
 import io.cat.ai.core.task.Task
 
 import scala.io.StdIn
+import scala.language.higherKinds
 
 trait AppConsole[F[_]] {
   def putStrLn(line: String): F[Unit]

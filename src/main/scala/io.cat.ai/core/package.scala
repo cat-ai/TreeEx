@@ -15,7 +15,7 @@ package object core {
     def build(edges: Seq[File], acc: Seq[File]): Seq[File] = edges match {
       case Nil => acc
 
-      case x +: xs if x.isDirectory => build(x.safeListFiles.toStream ++: xs, x +: acc)
+      case x +: xs if x.isDirectory => build(x.safeListFiles.toStream ++ xs, x +: acc)
 
       case x +: xs => if (x.getName()(0) != '.') build(xs, x +: acc) else build(xs, acc)
     }
@@ -52,4 +52,5 @@ package object core {
 
     case x => throw new IllegalArgumentException(s"$x is not a directory")
   }
+
 }

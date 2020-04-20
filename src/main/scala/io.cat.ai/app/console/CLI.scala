@@ -1,12 +1,8 @@
 package io.cat.ai.app.console
 
-import io.cat.ai.app.config.{TreeExConfig, TreeExConfigFactory}
+import io.cat.ai.app.config.TreeExConfig
+import io.cat.ai.app.console.args.TreeExArgs
 
 object CLI {
-
-  def apply(config: TreeExConfig): TreeExCLI = TreeExCLI(config)
-
-  def create(): TreeExCLI = TreeExCLI(TreeExConfigFactory.create)
-
-  def create(config: TreeExConfig): TreeExCLI = apply(config)
+  def create(config: TreeExConfig): TreeExCLI[TreeExArgs, Seq[String]] = new DefaultTreeExCLI(config)
 }

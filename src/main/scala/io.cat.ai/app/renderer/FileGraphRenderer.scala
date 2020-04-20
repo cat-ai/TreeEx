@@ -6,9 +6,10 @@ import io.cat.ai.app.mode.{DefaultMode, SpecMode, TreeExMode}
 import io.cat.ai.app.processor.TreeExFileProcessor
 import io.cat.ai.app.console.AppConsole
 import io.cat.ai.core.graph.Graph
-import io.cat.ai.app.console.AppConsole._
 
 import FileGraphRenderer._
+
+import AppConsole._
 
 final case class FileGraphRenderer(processor: TreeExFileProcessor) extends Renderer[Graph[File]] {
 
@@ -16,7 +17,7 @@ final case class FileGraphRenderer(processor: TreeExFileProcessor) extends Rende
                  edgeView: String,
                  nextOrOneEdgeView: String)(walker: FileGraphWalker,
                                             graph: Graph[File]): FileGraphWalker = {
-    AppConsole.putStrLn(s"$prefix$edgeView${processor.process(graph.value)}").effect
+    (for (_ <- putStrLn(s"$prefix$edgeView${processor.process(graph.value)}")) yield ()).effect
 
     graph.value match {
       case file if file.isDirectory => renderGraph(graph,s"$prefix$nextOrOneEdgeView")(walker.copy(nDirs = walker.nDirs + 1))
