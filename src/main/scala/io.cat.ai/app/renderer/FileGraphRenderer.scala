@@ -33,13 +33,13 @@ final case class FileGraphRenderer(processor: TreeExFileProcessor) extends Rende
     (walkerEx /: graph.edges.lastOption.filter(_.nonEmpty))(renderEdge(prefix, processor.view.oneEdgeView, processor.view.empty)(_, _))
   }
 
-  override def render(graph: Graph[File]): Unit = {
-    AppConsole.putStrLn(graph.value.getName).effect
-
-    val walker = renderGraph(graph)(FileGraphWalker())
-
-    AppConsole.putStrLn(result(walker, processor.mode)).effect
-  }
+  override def render(graph: Graph[File]): Unit =
+    (for {
+      _ <- putStrLn(graph.value.getName)
+      walker = renderGraph(graph)(FileGraphWalker())
+      _ <- putStrLn(result(walker, processor.mode))
+    } yield ()
+   ).effect
 }
 
 object FileGraphRenderer {
