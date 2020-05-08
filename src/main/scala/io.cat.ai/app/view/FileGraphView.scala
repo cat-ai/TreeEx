@@ -5,7 +5,7 @@ import java.io.File
 import io.cat.ai.app.console.colors._
 import io.cat.ai.core.file.FileOps._
 
-final case class FileGraphView(lineColor: ConsoleColor,
+final class FileGraphView(lineColor: ConsoleColor,
                                dirColor: ConsoleColor,
                                fileColor: ConsoleColor,
                                foundColor: ConsoleColor,

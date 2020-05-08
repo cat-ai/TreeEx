@@ -12,9 +12,9 @@ final case class TreeExFileProcessor(mode: TreeExMode,
 
     case x if mode.findValues exists(_ matches x.getName) => processFound(x)
 
-    case x if x.isDirectory =>  processDirectory(x)
+    case x if x.isDirectory                               => processDirectory(x)
 
-    case x => processFile(x)
+    case x                                                => processFile(x)
   }
 
   private def processDirectory(file: File): String =

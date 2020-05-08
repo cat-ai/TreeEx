@@ -16,14 +16,15 @@ final case class FileGraphRenderer(processor: TreeExFileProcessor) extends Rende
   def renderEdge(prefix: String,
                  edgeView: String,
                  nextOrOneEdgeView: String)(walker: FileGraphWalker,
-                                            graph: Graph[File]): FileGraphWalker = {
-    (for (_ <- putStrLn(s"$prefix$edgeView${processor.process(graph.value)}")) yield ()).effect
-
-    graph.value match {
-      case file if file.isDirectory => renderGraph(graph,s"$prefix$nextOrOneEdgeView")(walker.copy(nDirs = walker.nDirs + 1))
-      case _ => renderGraph(graph, s"$prefix$nextOrOneEdgeView")(walker.copy(nFiles = walker.nFiles + 1))
-    }
-  }
+                                            graph: Graph[File]): FileGraphWalker =
+    (for {
+      _     <- putStrLn(s"$prefix$edgeView${processor.process(graph.value)}")
+      result = graph.value match {
+        case file if file.isDirectory => renderGraph(graph, s"$prefix$nextOrOneEdgeView")(walker.copy(nDirs = walker.nDirs + 1))
+        case _                        => renderGraph(graph, s"$prefix$nextOrOneEdgeView")(walker.copy(nFiles = walker.nFiles + 1))
+      }
+    } yield result
+   ).effect
 
   def renderGraph(graph: Graph[File],
                   prefix: String = "")(walker: FileGraphWalker): FileGraphWalker = {
@@ -35,9 +36,9 @@ final case class FileGraphRenderer(processor: TreeExFileProcessor) extends Rende
 
   override def render(graph: Graph[File]): Unit =
     (for {
-      _ <- putStrLn(graph.value.getName)
+      _      <- putStrLn(graph.value.getName)
       walker = renderGraph(graph)(FileGraphWalker())
-      _ <- putStrLn(result(walker, processor.mode))
+      _      <- putStrLn(result(walker, processor.mode))
     } yield ()
    ).effect
 }
@@ -45,12 +46,13 @@ final case class FileGraphRenderer(processor: TreeExFileProcessor) extends Rende
 object FileGraphRenderer {
 
   private def helper(prefix: String, values: Seq[String]): String = values match {
-    case Nil => ""
+    case Nil  => ""
     case list => s", $prefix [${list mkString ", "}]"
   }
 
   private def result(walker: FileGraphWalker, mode: TreeExMode): String = mode match {
-    case DefaultMode => s"${walker.nDirs} directories, ${walker.nFiles} files"
+
+    case DefaultMode                         => s"${walker.nDirs} directories, ${walker.nFiles} files"
 
     case SpecMode(find, exclude, true, _, _) =>
       s"${walker.nDirs} directories, ${walker.nFiles} files${helper("find", find)}${helper("exclude", exclude)}"
@@ -61,7 +63,7 @@ object FileGraphRenderer {
     case SpecMode(find, exclude, _, _, true) =>
       s"${walker.nDirs} directories, ${walker.nFiles} marked files${helper("find", find)}${helper("exclude", exclude)}"
 
-    case SpecMode(find, exclude, _, _, _) =>
+    case SpecMode(find, exclude, _, _, _)    =>
       s"${walker.nDirs} directories, ${walker.nFiles} files${helper("find", find)}${helper("exclude", exclude)}"
   }
 }

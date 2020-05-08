@@ -6,7 +6,7 @@ import io.cat.ai.app.console.args.{CLArg, CLArgValue, CLArgsValue}
 
 import scala.collection.JavaConverters._
 
-final case class TreeExConfig(conf: Config) {
+final class TreeExConfig(conf: Config) {
 
   lazy val appArgs: Vector[CLArg] =
     for {
